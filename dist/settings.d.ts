@@ -1,0 +1,18 @@
+export declare const PLATFORM_NAME = "MrCoolCielo";
+export declare const PLUGIN_NAME = "homebridge-mrcool-cielo";
+export declare const URL_API = "api.smartcielo.com";
+export declare const URL_API_WSS = "wss.smartcielo.com";
+export declare const URL_CIELO = "https://home.cielowigle.com/";
+export declare const URL_API_LOGIN = "user/smarthvac/login/1";
+export declare const URL_API_REFRESH = "user/token/refresh";
+export declare const URL_API_DEVICES = "web/devices?limit=420";
+export declare const URL_API_APPLIANCE_INFO = "web/sync/db/6";
+export declare const IOS_X_API_KEY = "T90bwfODtWaIUreVJtroN3itKWquNnUGRYiYUsf0";
+export declare const WEB_X_API_KEY = "3iCWYuBqpY2g7yRq3yyTk1XCS4CMjt1n9ECCjdpd";
+export declare const IOS_USER_AGENT = "MRCOOL SmartHVAC/4.3.0 (com.smarthvac; build:2; iOS 26.5.0) Alamofire/5.9.1";
+export declare const WEB_USER_AGENT = "Mozilla/5.0 (Linux; Android 6.0; Nexus 5 Build/MRA58N) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/116.0.0.0 Mobile Safari/537.36";
+export declare const TIME_REFRESH_TOKEN_SEC = 3300;
+export declare const TIMER_PING_SEC = 540;
+export declare const TIMER_PONG_TIMEOUT_SEC = 60;
+export declare const RECONNECT_BASE_DELAY_SEC = 10;
+export declare const RECONNECT_MAX_DELAY_SEC = 300;

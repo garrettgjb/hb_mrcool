@@ -1,0 +1,39 @@
+{
+  "name": "homebridge-mrcool-cielo",
+  "version": "0.1.0",
+  "description": "Self-hosted Homebridge plugin for a MrCool DIY mini split controlled via a Cielo Breez-i WiFi dongle",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/garrettgjb/hb_mrcool.git"
+  },
+  "main": "dist/index.js",
+  "files": [
+    "dist",
+    "config.schema.json",
+    "README.md"
+  ],
+  "engines": {
+    "node": ">=18.0.0",
+    "homebridge": ">=1.6.0"
+  },
+  "scripts": {
+    "build": "rimraf dist && tsc",
+    "watch": "tsc --watch"
+  },
+  "keywords": [
+    "homebridge-plugin",
+    "cielo",
+    "mrcool"
+  ],
+  "dependencies": {
+    "ws": "^8.18.0"
+  },
+  "devDependencies": {
+    "@types/node": "^20.14.0",
+    "@types/ws": "^8.5.10",
+    "homebridge": "^1.8.4",
+    "rimraf": "^5.0.7",
+    "typescript": "^5.5.4"
+  }
+}

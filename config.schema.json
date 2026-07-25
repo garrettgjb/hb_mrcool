@@ -1,0 +1,33 @@
+{
+  "pluginAlias": "MrCoolCielo",
+  "pluginType": "platform",
+  "singular": true,
+  "headerDisplay": "Controls a MrCool/Cielo mini split through Cielo's cloud API (login used is the same one your Cielo Home / MRCOOL SmartHVAC app uses).",
+  "schema": {
+    "type": "object",
+    "properties": {
+      "name": {
+        "title": "Platform Name",
+        "type": "string",
+        "default": "MrCool Cielo",
+        "required": true
+      },
+      "email": {
+        "title": "Cielo Account Email",
+        "type": "string",
+        "required": true
+      },
+      "password": {
+        "title": "Cielo Account Password",
+        "type": "string",
+        "required": true
+      },
+      "macAddress": {
+        "title": "Dongle MAC Address (optional)",
+        "type": "string",
+        "description": "MAC address of one specific Cielo device to control, e.g. c4:d8:d5:18:b6:43. Leave blank to auto-register every device found on your Cielo account as its own accessory.",
+        "required": false
+      }
+    }
+  }
+}
