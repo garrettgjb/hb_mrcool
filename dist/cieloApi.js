@@ -492,19 +492,28 @@ class CieloApi extends events_1.EventEmitter {
     /** cool | heat | auto | dry | fan */
     setMode(device, mode) {
         this.log.info('[%s] setMode(%s) requested (currently %s)', device.deviceName, mode, device.latestAction.mode);
-        if (device.latestAction.power === 'off') {
-            this.setPower(device, true);
-        }
         let value = mode;
         if (mode === 'cool' && device.appliance.mode === 'mode') {
             // Some single-mode appliances report their only mode as literally "mode".
             value = 'mode';
         }
-        if (device.latestAction.mode === value) {
+        const needsPowerOn = device.latestAction.power === 'off';
+        if (!needsPowerOn && device.latestAction.mode === value) {
             this.log.info('[%s] setMode: already %s, skipping', device.deviceName, value);
             return;
         }
-        this.send(device, { mode: value }, 'mode', value);
+        // Power-on and mode change must go in the SAME command, not two
+        // sequential ones. Sending them separately (power-on first, using
+        // whatever mode was last cached, then a follow-up mode-change command)
+        // creates a real window where the device receives "on" with the stale
+        // mode before the correction arrives - e.g. turning the unit back on
+        // after it was last in Dry very briefly re-engages Dry before flipping
+        // to the newly requested mode.
+        const changes = { mode: value };
+        if (needsPowerOn) {
+            changes.power = 'on';
+        }
+        this.send(device, changes, 'mode', value);
     }
     /** auto | low | medium | high */
     setFanSpeed(device, speed) {

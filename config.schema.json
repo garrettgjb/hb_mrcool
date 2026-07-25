@@ -27,6 +27,12 @@
         "type": "string",
         "description": "MAC address of one specific Cielo device to control, e.g. c4:d8:d5:18:b6:43. Leave blank to auto-register every device found on your Cielo account as its own accessory.",
         "required": false
+      },
+      "exposeDryMode": {
+        "title": "Expose Dry Mode switch",
+        "type": "boolean",
+        "default": false,
+        "description": "Off by default. A Dry Mode switch is easy to trigger by accident (a misplaced tap, a Siri misfire) and, unlike Heat/Cool/Auto, there's no separate confirmation step - turn this on only if you actually want to use dehumidify mode from HomeKit."
       }
     }
   }

@@ -3,6 +3,8 @@ interface MrCoolCieloConfig extends PlatformConfig {
     email: string;
     password: string;
     macAddress?: string;
+    /** Off by default - a Dry Mode switch is easy to trigger by accident (Siri, a misplaced tap), and unlike Heat/Cool/Auto there's no separate confirmation step. */
+    exposeDryMode?: boolean;
 }
 export declare class MrCoolCieloPlatform implements DynamicPlatformPlugin {
     readonly log: Logging;

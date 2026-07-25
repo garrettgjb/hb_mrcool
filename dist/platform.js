@@ -82,16 +82,16 @@ class MrCoolCieloPlatform {
                 this.log.error('Configured macAddress %s not found. Available devices: %s', config.macAddress, devices.map((d) => `${d.deviceName} (${d.macAddress})`).join(', '));
                 return;
             }
-            this.registerDevice(match);
+            this.registerDevice(match, config.exposeDryMode ?? false);
             return;
         }
         // Otherwise auto-register every device found on the account.
         this.log.info('No macAddress configured - auto-registering all %s device(s) found on the account: %s', devices.length, devices.map((d) => `${d.deviceName} (${d.macAddress})`).join(', '));
         for (const device of devices) {
-            this.registerDevice(device);
+            this.registerDevice(device, config.exposeDryMode ?? false);
         }
     }
-    registerDevice(device) {
+    registerDevice(device, exposeDryMode) {
         const uuid = this.api.hap.uuid.generate(device.macAddress);
         let accessory = this.cachedAccessories.find((a) => a.UUID === uuid);
         if (accessory) {
@@ -105,7 +105,7 @@ class MrCoolCieloPlatform {
             accessory.context.device = device;
             this.api.registerPlatformAccessories(settings_1.PLUGIN_NAME, settings_1.PLATFORM_NAME, [accessory]);
         }
-        const thermostat = new thermostatAccessory_1.ThermostatAccessory(this, accessory, this.cielo, device, device.deviceName);
+        const thermostat = new thermostatAccessory_1.ThermostatAccessory(this, accessory, this.cielo, device, device.deviceName, exposeDryMode);
         this.thermostats.set(device.macAddress, thermostat);
     }
 }

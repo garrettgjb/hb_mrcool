@@ -16,6 +16,8 @@ interface MrCoolCieloConfig extends PlatformConfig {
   email: string;
   password: string;
   macAddress?: string;
+  /** Off by default - a Dry Mode switch is easy to trigger by accident (Siri, a misplaced tap), and unlike Heat/Cool/Auto there's no separate confirmation step. */
+  exposeDryMode?: boolean;
 }
 
 export class MrCoolCieloPlatform implements DynamicPlatformPlugin {
@@ -80,7 +82,7 @@ export class MrCoolCieloPlatform implements DynamicPlatformPlugin {
         );
         return;
       }
-      this.registerDevice(match);
+      this.registerDevice(match, config.exposeDryMode ?? false);
       return;
     }
 
@@ -91,11 +93,11 @@ export class MrCoolCieloPlatform implements DynamicPlatformPlugin {
       devices.map((d) => `${d.deviceName} (${d.macAddress})`).join(', '),
     );
     for (const device of devices) {
-      this.registerDevice(device);
+      this.registerDevice(device, config.exposeDryMode ?? false);
     }
   }
 
-  private registerDevice(device: CieloDevice): void {
+  private registerDevice(device: CieloDevice, exposeDryMode: boolean): void {
     const uuid = this.api.hap.uuid.generate(device.macAddress);
     let accessory = this.cachedAccessories.find((a) => a.UUID === uuid);
 
@@ -110,7 +112,14 @@ export class MrCoolCieloPlatform implements DynamicPlatformPlugin {
       this.api.registerPlatformAccessories(PLUGIN_NAME, PLATFORM_NAME, [accessory]);
     }
 
-    const thermostat = new ThermostatAccessory(this, accessory, this.cielo!, device, device.deviceName);
+    const thermostat = new ThermostatAccessory(
+      this,
+      accessory,
+      this.cielo!,
+      device,
+      device.deviceName,
+      exposeDryMode,
+    );
     this.thermostats.set(device.macAddress, thermostat);
   }
 }

@@ -6,11 +6,12 @@ exports.ThermostatAccessory = void 0;
 // treats 0% on a fan/rotation-speed characteristic as equivalent to off.
 const FAN_SPEED_ORDER = ['auto', 'low', 'medium', 'high'];
 class ThermostatAccessory {
-    constructor(platform, accessory, cielo, initialDevice, displayName) {
+    constructor(platform, accessory, cielo, initialDevice, displayName, exposeDryMode) {
         this.platform = platform;
         this.accessory = accessory;
         this.cielo = cielo;
         this.displayName = displayName;
+        this.exposeDryMode = exposeDryMode;
         this.device = initialDevice;
         const { Service, Characteristic } = this.platform;
         this.supportsFanSpeed = !!this.device.appliance.fan && this.device.appliance.fan.trim() !== '';
@@ -83,7 +84,7 @@ class ThermostatAccessory {
                 this.accessory.removeService(stale);
             }
         }
-        if (supportedModes.includes('dry')) {
+        if (supportedModes.includes('dry') && this.exposeDryMode) {
             this.dryModeSwitch =
                 this.accessory.getServiceById(Service.Switch, 'dry-mode') ||
                     this.accessory.addService(Service.Switch, `${this.displayName} Dry Mode`, 'dry-mode');
@@ -98,6 +99,16 @@ class ThermostatAccessory {
                     this.cielo.setPower(this.device, false);
                 }
             });
+        }
+        else {
+            // Migration cleanup: remove a previously-registered Dry Mode switch if
+            // exposeDryMode is now off (or was never explicitly turned on - this
+            // defaults to off specifically so it can't be triggered by an
+            // accidental tap or Siri misfire).
+            const stale = this.accessory.getServiceById(Service.Switch, 'dry-mode');
+            if (stale) {
+                this.accessory.removeService(stale);
+            }
         }
     }
     /** Called by the platform whenever a StateUpdate arrives for this device's MAC. */

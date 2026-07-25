@@ -21,6 +21,7 @@ export class ThermostatAccessory {
     private readonly cielo: CieloApi,
     initialDevice: CieloDevice,
     private readonly displayName: string,
+    private readonly exposeDryMode: boolean,
   ) {
     this.device = initialDevice;
     const { Service, Characteristic } = this.platform;
@@ -108,7 +109,7 @@ export class ThermostatAccessory {
       }
     }
 
-    if (supportedModes.includes('dry')) {
+    if (supportedModes.includes('dry') && this.exposeDryMode) {
       this.dryModeSwitch =
         this.accessory.getServiceById(Service.Switch, 'dry-mode') ||
         this.accessory.addService(Service.Switch, `${this.displayName} Dry Mode`, 'dry-mode');
@@ -122,6 +123,15 @@ export class ThermostatAccessory {
             this.cielo.setPower(this.device, false);
           }
         });
+    } else {
+      // Migration cleanup: remove a previously-registered Dry Mode switch if
+      // exposeDryMode is now off (or was never explicitly turned on - this
+      // defaults to off specifically so it can't be triggered by an
+      // accidental tap or Siri misfire).
+      const stale = this.accessory.getServiceById(Service.Switch, 'dry-mode');
+      if (stale) {
+        this.accessory.removeService(stale);
+      }
     }
   }
 

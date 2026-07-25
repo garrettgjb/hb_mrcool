@@ -19,12 +19,15 @@ One accessory per indoor unit, containing:
 
 - A **Heater/Cooler** service (the primary tile): on/off, Heat / Cool / Auto,
   current + target temperature, fan speed, swing.
-- A **Dry Mode** switch, if your unit supports a dehumidify mode.
+- A **Dry Mode** switch, only if your unit supports it *and* you've turned on
+  `exposeDryMode` in config (off by default — see below).
 
 HomeKit's HeaterCooler service has no native "fan only" target state, and
 fan-only mode is deliberately **not** exposed at all — a bolted-on separate
 Fan service for just that one mode read as more confusing than useful. Dry
-mode gets a plain switch since there's nowhere else for it to live.
+mode gets a plain switch since there's nowhere else for it to live, but it's
+opt-in: a switch is a single accidental tap (or Siri misfire) away from
+triggering, unlike Heat/Cool/Auto which live behind a deliberate mode picker.
 
 Fan speed is exposed as `RotationSpeed` (only if the device reports
 supporting adjustable fan speed) in four bands - `auto`/`low`/`medium`/`high`,
@@ -75,6 +78,14 @@ only a menu of fixed positions plus continuous oscillation.
    account (e.g. "Living Room") - rename them directly in the Home app if
    you want something else.
 
+   To expose the Dry Mode switch (off by default - see "Exposes in HomeKit"
+   above for why), add:
+   ```json
+   {
+     "exposeDryMode": true
+   }
+   ```
+
 3. Restart Homebridge.
 
 Access/refresh tokens are cached in Homebridge's storage directory
@@ -111,6 +122,26 @@ CIELO_EMAIL="you@example.com" CIELO_PASSWORD="yourpassword" \
 ```
 Leave `CIELO_TEMP_F` unset to just log incoming broadcasts without sending
 a command.
+
+## MAC address handling
+
+Cielo's API is case-sensitive about this in a way that fails silently if
+you're not careful. Every `CieloDevice` tracks two forms of its MAC address:
+
+- `macAddress` - normalized (lowercase, no separators). Used only for
+  internal map keys and for matching the `macAddress` config option.
+- `rawMacAddress` - Cielo's original casing/format as returned by its REST
+  API (e.g. `C4D8D518B643`). Always use this one for anything sent to
+  Cielo's cloud.
+
+Sending the normalized (lowercase) MAC in an outgoing command doesn't
+error - the websocket accepts it, the cloud responds normally, but it
+never actually relays the command to the physical device. This was a real
+bug (see `src/cieloApi.ts` comments near `rawMacAddress` and `connection_source`
+for the other one like it) that took a while to track down specifically
+*because* it fails silently instead of throwing or logging anything wrong.
+If you're adding a new outgoing command type, use `rawMacAddress`, not
+`macAddress`.
 
 ## Known limitations (v1)
 
