@@ -1,9 +1,12 @@
 # homebridge-mrcool-cielo
 
-A self-hosted Homebridge plugin for a MrCool DIY mini split controlled by a
-Cielo Breez-i WiFi dongle (model `diy-18-hp-wmah-230d25-0` + Cielo dongle).
+A self-hosted Homebridge plugin for MrCool/Cielo mini splits and
+thermostats — any device on your Cielo Home / MRCOOL SmartHVAC account.
+Originally built for a MrCool DIY 5th-gen air handler with a Cielo Breez-i
+WiFi dongle (model `diy-18-hp-wmah-230d25-0`), and also tested against a
+Cielo Breez-Max mini-stat on the same account.
 
-The dongle has no local API — it only talks to Cielo's cloud
+These devices have no local API — they only talk to Cielo's cloud
 (`api.smartcielo.com` / `wss.smartcielo.com`), the same as the Cielo Home /
 MRCOOL SmartHVAC apps. This plugin logs in through the same endpoint the
 mobile app uses, which — unlike the web login at home.cielowigle.com — is not
@@ -23,15 +26,17 @@ fan-only mode is deliberately **not** exposed at all — a bolted-on separate
 Fan service for just that one mode read as more confusing than useful. Dry
 mode gets a plain switch since there's nowhere else for it to live.
 
-Fan speed is exposed as `RotationSpeed` in four bands (this device supports
-`auto`/`low`/`medium`/`high`, no separate "turbo" speed tier): 1-25% → auto,
-26-50% → low, 51-75% → medium, 76-100% → high. Auto is deliberately not 0%,
-since HomeKit treats 0% as equivalent to off.
+Fan speed is exposed as `RotationSpeed` (only if the device reports
+supporting adjustable fan speed) in four bands - `auto`/`low`/`medium`/`high`,
+no separate "turbo" speed tier: 1-25% → auto, 26-50% → low, 51-75% → medium,
+76-100% → high. Auto is deliberately not 0%, since HomeKit treats 0% as
+equivalent to off.
 
-Swing is exposed as the binary `SwingMode` characteristic: enabled maps to
-the device's oscillating "auto" swing, disabled maps to its first fixed
-position (e.g. "pos1") — this device has no distinct "swing off" position of
-its own, only a menu of fixed positions plus continuous oscillation.
+Swing is exposed as the binary `SwingMode` characteristic (only if the
+device reports supporting swing): enabled maps to the device's oscillating
+"auto" swing, disabled maps to its first fixed position (e.g. "pos1") -
+Cielo devices generally have no distinct "swing off" position of their own,
+only a menu of fixed positions plus continuous oscillation.
 
 ## Setup
 
@@ -117,5 +122,7 @@ a command.
 - This depends entirely on Cielo's cloud staying reachable and the
   reverse-engineered endpoints/payload quirks not changing. If Cielo changes
   their API, this plugin breaks until updated.
-- Only tested against a single-appliance Cielo account with a Breez-i dongle
-  (`deviceTypeVersion: BI04`).
+- Tested against a two-device Cielo account: a Breez-i dongle
+  (`deviceTypeVersion: BI04`) and a Breez-Max mini-stat (`MSMT05`). Other
+  device types/generations likely work (the protocol appears generic across
+  Cielo's device catalog) but haven't been specifically verified.
